@@ -31,7 +31,7 @@
     },
     "require": {
         "php": ">=5.6.0",
-        "webignition/web-resource-interfaces":"^0.8",
+        "webignition/web-resource-interfaces":"^0.9",
         "webignition/internet-media-type-interface":"^0.1",
         "webignition/web-resource-model": "^3",
         "webignition/web-page-model": "^3",
