@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "d80db510bd48748a80ef655dd01596c4",
+    "content-hash": "de6ea015fa4336cf567ea7a21b8592bb",
     "packages": [
         {
             "name": "guzzlehttp/guzzle",
@@ -672,32 +672,32 @@
         },
         {
             "name": "webignition/web-page-model",
-            "version": "3.0",
+            "version": "3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/web-page-model.git",
-                "reference": "3debf04c969819e72cbb703ae8d0813ef05eae24"
+                "reference": "e5619674b2c8f78c5d079465e37dc624cbd33caa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/web-page-model/zipball/3debf04c969819e72cbb703ae8d0813ef05eae24",
-                "reference": "3debf04c969819e72cbb703ae8d0813ef05eae24",
+                "url": "https://api.github.com/repos/webignition/web-page-model/zipball/e5619674b2c8f78c5d079465e37dc624cbd33caa",
+                "reference": "e5619674b2c8f78c5d079465e37dc624cbd33caa",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.6.0",
                 "querypath/querypath": ">=3.0.0",
-                "webignition/character-set-list": ">=0.2,<1.0",
-                "webignition/internet-media-type": ">=1.2,<2.0",
-                "webignition/internet-media-type-interface": ">=0.1,<1",
-                "webignition/web-resource-interfaces": ">=0.8,<1",
-                "webignition/web-resource-model": ">=3.0.1,<4"
+                "webignition/character-set-list": "^0.2",
+                "webignition/internet-media-type": "^1.2",
+                "webignition/internet-media-type-interface": "^0.1",
+                "webignition/web-resource-interfaces": "^0.9",
+                "webignition/web-resource-model": "^3.1"
             },
             "require-dev": {
-                "mockery/mockery": "~1.0",
-                "phpunit/phpunit": "~5.0",
-                "squizlabs/php_codesniffer": "3.*",
-                "webignition/web-resource-testing-tools": ">=0.2,<1"
+                "mockery/mockery": "^1",
+                "phpunit/phpunit": "^5",
+                "squizlabs/php_codesniffer": "^3",
+                "webignition/web-resource-testing-tools": "^0.2"
             },
             "type": "library",
             "autoload": {
@@ -721,20 +721,20 @@
                 "model",
                 "webpage"
             ],
-            "time": "2018-03-23T12:54:23+00:00"
+            "time": "2018-03-23T14:49:26+00:00"
         },
         {
             "name": "webignition/web-resource-interfaces",
-            "version": "0.8",
+            "version": "0.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/web-resource-interfaces.git",
-                "reference": "e63c525c6427b350ed74b683cb8a2484d9419748"
+                "reference": "90705b3c5e571a9046b52bf033ea23c3cfcf5ade"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/web-resource-interfaces/zipball/e63c525c6427b350ed74b683cb8a2484d9419748",
-                "reference": "e63c525c6427b350ed74b683cb8a2484d9419748",
+                "url": "https://api.github.com/repos/webignition/web-resource-interfaces/zipball/90705b3c5e571a9046b52bf033ea23c3cfcf5ade",
+                "reference": "90705b3c5e571a9046b52bf033ea23c3cfcf5ade",
                 "shasum": ""
             },
             "require": {
@@ -767,34 +767,34 @@
                 "psr-7",
                 "web-page"
             ],
-            "time": "2018-03-22T14:35:36+00:00"
+            "time": "2018-03-23T14:31:08+00:00"
         },
         {
             "name": "webignition/web-resource-model",
-            "version": "3.0.1",
+            "version": "3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/web-resource-model.git",
-                "reference": "4509464b3cf926d0427bbebd3bf2972055f29efc"
+                "reference": "e401d2856f0ce71943f58f266cbec72d0e74407f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/web-resource-model/zipball/4509464b3cf926d0427bbebd3bf2972055f29efc",
-                "reference": "4509464b3cf926d0427bbebd3bf2972055f29efc",
+                "url": "https://api.github.com/repos/webignition/web-resource-model/zipball/e401d2856f0ce71943f58f266cbec72d0e74407f",
+                "reference": "e401d2856f0ce71943f58f266cbec72d0e74407f",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.6.0",
-                "psr/http-message": "~1.0",
-                "webignition/internet-media-type": ">=1.2,<2.0",
-                "webignition/internet-media-type-interface": ">=0.1,<1",
-                "webignition/web-resource-interfaces": ">=0.8,<1"
+                "psr/http-message": "^1",
+                "webignition/internet-media-type": "^1.2",
+                "webignition/internet-media-type-interface": "^0.1",
+                "webignition/web-resource-interfaces": "^0.9"
             },
             "require-dev": {
-                "mockery/mockery": "~1.0",
-                "phpunit/phpunit": "~5.0",
-                "squizlabs/php_codesniffer": "3.*",
-                "webignition/web-resource-testing-tools": ">=0.1,<1"
+                "mockery/mockery": "^1",
+                "phpunit/phpunit": "^5",
+                "squizlabs/php_codesniffer": "^3",
+                "webignition/web-resource-testing-tools": "^0.1"
             },
             "type": "library",
             "autoload": {
@@ -819,7 +819,7 @@
                 "psr-7",
                 "web"
             ],
-            "time": "2018-03-23T12:19:11+00:00"
+            "time": "2018-03-23T14:42:31+00:00"
         }
     ],
     "packages-dev": [
