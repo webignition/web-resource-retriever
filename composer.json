@@ -31,13 +31,14 @@
     },
     "require": {
         "php": ">=5.6.0",
-        "webignition/web-resource-interfaces":"^0.9",
+        "webignition/web-resource-interfaces":">0.1,<1",
         "webignition/internet-media-type-interface":"^0.1",
-        "webignition/web-resource-model": "^3",
-        "webignition/web-page-model": "^3",
-        "webignition/web-json-model": "^3",
+        "webignition/web-resource-model": ">=3.2.1,<4",
+        "webignition/web-page-model": ">=3.1.1,<4",
+        "webignition/web-json-model": ">=3.1.1,<4",
         "webignition/internet-media-type":"^1.2",
-        "guzzlehttp/guzzle":"^6"
+        "guzzlehttp/guzzle":"^6",
+        "webignition/guzzle-curl-exception":"^1"
     },
     "require-dev": {
         "phpunit/phpunit": "^5.0",
