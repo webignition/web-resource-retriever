@@ -4,17 +4,17 @@ namespace webignition\WebResource;
 
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\BadResponseException;
+use GuzzleHttp\Exception\ConnectException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use webignition\InternetMediaType\InternetMediaType;
 use webignition\InternetMediaType\Parser\ParseException as InternetMediaTypeParseException;
 use webignition\InternetMediaType\Parser\Parser as InternetMediaTypeParser;
 use webignition\InternetMediaTypeInterface\InternetMediaTypeInterface;
-use webignition\WebResource\Exception\Exception as WebResourceException;
+use webignition\WebResource\Exception\HttpException;
 use webignition\WebResource\Exception\InvalidContentTypeException;
+use webignition\WebResource\Exception\TransportException;
 use webignition\WebResource\WebPage\WebPage;
-use webignition\WebResourceInterfaces\InvalidContentTypeExceptionInterface;
-use webignition\WebResourceInterfaces\RetrieverExceptionInterface;
 use webignition\WebResourceInterfaces\RetrieverInterface;
 use webignition\WebResourceInterfaces\WebResourceInterface;
 
@@ -93,9 +93,10 @@ class Retriever implements RetrieverInterface
      * An InvalidContentTypeExceptionInterface instance MUST  be thrown when the content type of a resource
      * does not match one of those provided by setAllowedContentTypes() and when unknown resource types are not allowed.
      *
-     * @throws RetrieverExceptionInterface for cases where a resource could not be retrieved
-     * @throws InvalidContentTypeExceptionInterface for cases where the retrieved resource content type is not allowed
+     * @throws HttpException
      * @throws InternetMediaTypeParseException
+     * @throws InvalidContentTypeException
+     * @throws TransportException
      */
     public function retrieve(RequestInterface $request)
     {
@@ -110,13 +111,15 @@ class Retriever implements RetrieverInterface
             $response = $this->httpClient->send($request);
         } catch (BadResponseException $badResponseException) {
             $response = $badResponseException->getResponse();
+        } catch (ConnectException $exception) {
+            throw new TransportException($request, $exception);
         }
 
         $responseStatusCode = $response->getStatusCode();
         $isSuccessResponse = $responseStatusCode >= 200 && $responseStatusCode < 300;
 
         if (!$isSuccessResponse) {
-            throw new WebResourceException($response, $request);
+            throw new HttpException($request, $response);
         }
 
         $modelClassName = $this->getModelClassNameFromContentTypeWithContentTypeVerification($request, $response);
