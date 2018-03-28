@@ -4,7 +4,7 @@ namespace webignition\WebResource;
 
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\BadResponseException;
-use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\RequestException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use webignition\InternetMediaType\InternetMediaType;
@@ -111,8 +111,8 @@ class Retriever implements RetrieverInterface
             $response = $this->httpClient->send($request);
         } catch (BadResponseException $badResponseException) {
             $response = $badResponseException->getResponse();
-        } catch (ConnectException $exception) {
-            throw new TransportException($request, $exception);
+        } catch (RequestException $requestException) {
+            throw new TransportException($request, $requestException);
         }
 
         $responseStatusCode = $response->getStatusCode();
@@ -182,14 +182,7 @@ class Retriever implements RetrieverInterface
     {
         try {
             $response = $this->httpClient->send($request);
-        } catch (BadResponseException $badResponseException) {
-            $response = $badResponseException->getResponse();
-        }
-
-        $responseStatusCode = $response->getStatusCode();
-        $isSuccessResponse = $responseStatusCode >= 200 && $responseStatusCode < 300;
-
-        if (!$isSuccessResponse) {
+        } catch (RequestException $requestException) {
             return null;
         }
 

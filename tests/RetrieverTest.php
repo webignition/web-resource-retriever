@@ -124,15 +124,17 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider throwsCurlTransportExceptionDataProvider
      *
+     * @param bool $allowUnknownResourceTypes
      * @param array $httpFixtures
      * @param string $expectedExceptionMessage
      * @param int $expectedExceptionCurlCode
      *
+     * @throws HttpException
      * @throws InternetMediaTypeParseException
-     * @throws InvalidContentTypeExceptionInterface
-     * @throws RetrieverExceptionInterface
+     * @throws InvalidContentTypeException
      */
     public function testThrowsCurlTransportException(
+        $allowUnknownResourceTypes,
         array $httpFixtures,
         $expectedExceptionMessage,
         $expectedExceptionCurlCode
@@ -144,7 +146,7 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
 
         $request = new Request('GET', 'http://example.com');
 
-        $retriever = new Retriever($httpClient);
+        $retriever = new Retriever($httpClient, [], $allowUnknownResourceTypes);
 
         try {
             $retriever->retrieve($request);
@@ -169,8 +171,18 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
         );
 
         return [
-            'operation timed out' => [
+            'operation timed out, fails post-verify' => [
+                'allowUnknownResourceTypes' => true,
                 'httpFixtures' => [
+                    $operationTimedOutConnectException,
+                ],
+                'expectedExceptionMessage' => 'operation timed out',
+                'expectedExceptionCurlCode' => 28,
+            ],
+            'operation timed out, fails pre-verify' => [
+                'allowUnknownResourceTypes' => false,
+                'httpFixtures' => [
+                    $operationTimedOutConnectException,
                     $operationTimedOutConnectException,
                 ],
                 'expectedExceptionMessage' => 'operation timed out',

@@ -3,6 +3,8 @@
 namespace webignition\WebResource\Exception;
 
 use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\TooManyRedirectsException;
 use Psr\Http\Message\RequestInterface;
 use webignition\GuzzleHttp\Exception\CurlException\Exception as CurlException;
 use webignition\GuzzleHttp\Exception\CurlException\Factory as CurlExceptionFactory;
@@ -12,19 +14,21 @@ class TransportException extends AbstractException implements RetrieverTransport
 {
     /**
      * @param RequestInterface|null $request
-     * @param ConnectException $connectException
+     * @param RequestException $requestException
      */
-    public function __construct(RequestInterface $request, ConnectException $connectException)
+    public function __construct(RequestInterface $request, RequestException $requestException)
     {
-        $message = $connectException->getMessage();
-        $code = $connectException->getCode();
-        $previous = $connectException;
+        $message = $requestException->getMessage();
+        $code = $requestException->getCode();
+        $previous = $requestException;
 
-        if (CurlExceptionFactory::isCurlException($connectException)) {
-            $curlException = CurlExceptionFactory::fromConnectException($connectException);
-            $message = $curlException->getMessage();
-            $code = $curlException->getCurlCode();
-            $previous = $curlException;
+        if ($requestException instanceof ConnectException) {
+            if (CurlExceptionFactory::isCurlException($requestException)) {
+                $curlException = CurlExceptionFactory::fromConnectException($requestException);
+                $message = $curlException->getMessage();
+                $code = $curlException->getCurlCode();
+                $previous = $curlException;
+            }
         }
 
         parent::__construct($request, $message, $code, $previous);
@@ -44,5 +48,13 @@ class TransportException extends AbstractException implements RetrieverTransport
     public function isCurlException()
     {
         return $this->getPrevious() instanceof CurlException;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isTooManyRedirectsException()
+    {
+        return $this->getPrevious() instanceof TooManyRedirectsException;
     }
 }

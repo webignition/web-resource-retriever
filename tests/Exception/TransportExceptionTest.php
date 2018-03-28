@@ -3,6 +3,8 @@
 namespace webignition\Tests\WebResource\Exception;
 
 use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\TooManyRedirectsException;
 use Mockery\MockInterface;
 use Psr\Http\Message\RequestInterface;
 use webignition\GuzzleHttp\Exception\CurlException\Exception as CurlException;
@@ -14,19 +16,21 @@ class TransportExceptionTest extends \PHPUnit_Framework_TestCase
      * @dataProvider createDataProvider
      *
      * @param RequestInterface $request
-     * @param ConnectException $connectException
+     * @param RequestException $requestException
      * @param string $expectedMessage
      * @param int $expectedCode
      * @param bool $expectedIsCurlException
+     * @param bool $expectedIsTooManyRedirectsException
      */
     public function testCreate(
         RequestInterface $request,
-        ConnectException $connectException,
+        RequestException $requestException,
         $expectedMessage,
         $expectedCode,
-        $expectedIsCurlException
+        $expectedIsCurlException,
+        $expectedIsTooManyRedirectsException
     ) {
-        $exception = new TransportException($request, $connectException);
+        $exception = new TransportException($request, $requestException);
 
         $this->assertEquals($request, $exception->getRequest());
 
@@ -34,6 +38,7 @@ class TransportExceptionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedCode, $exception->getCode());
         $this->assertEquals($expectedCode, $exception->getTransportErrorCode());
         $this->assertEquals($expectedIsCurlException, $exception->isCurlException());
+        $this->assertEquals($expectedIsTooManyRedirectsException, $exception->isTooManyRedirectsException());
 
         $previousException = $exception->getPrevious();
 
@@ -43,7 +48,7 @@ class TransportExceptionTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals($expectedMessage, $previousException->getMessage());
             $this->assertEquals($expectedCode, $previousException->getCurlCode());
         } else {
-            $this->assertEquals($connectException, $previousException);
+            $this->assertEquals($requestException, $previousException);
         }
     }
 
@@ -56,9 +61,15 @@ class TransportExceptionTest extends \PHPUnit_Framework_TestCase
         $request = \Mockery::mock(RequestInterface::class);
 
         $curlErrorMessage = 'Resolving timed out after 4 milliseconds';
+        $tooManyRedirectsExceptionMessage = 'Will not follow more than 5 redirects';
 
         $curl28ConnectException = new ConnectException('cURL error 28: ' . $curlErrorMessage, $request);
         $genericConnectException = new ConnectException('foo', $request);
+
+        $tooManyRedirectsException = new TooManyRedirectsException(
+            $tooManyRedirectsExceptionMessage,
+            $request
+        );
 
         return [
             'cURL 28 time out' => [
@@ -67,6 +78,15 @@ class TransportExceptionTest extends \PHPUnit_Framework_TestCase
                 'expectedMessage' => $curlErrorMessage,
                 'expectedCode' => 28,
                 'expectedIsCurlException' => true,
+                'expectedIsTooManyRedirectsException' => false,
+            ],
+            'too many redirects exception' => [
+                'request' => $request,
+                'connectException' => $tooManyRedirectsException,
+                'expectedMessage' => $tooManyRedirectsExceptionMessage,
+                'expectedCode' => 0,
+                'expectedIsCurlException' => false,
+                'expectedIsTooManyRedirectsException' => true,
             ],
             'generic connect exception' => [
                 'request' => $request,
@@ -74,6 +94,7 @@ class TransportExceptionTest extends \PHPUnit_Framework_TestCase
                 'expectedMessage' => 'foo',
                 'expectedCode' => 0,
                 'expectedIsCurlException' => false,
+                'expectedIsTooManyRedirectsException' => false,
             ],
         ];
     }
