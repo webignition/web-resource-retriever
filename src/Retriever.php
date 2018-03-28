@@ -142,9 +142,10 @@ class Retriever implements RetrieverInterface
     ) {
         $contentType = $this->getContentTypeFromResponse($response);
         $modelClassName = $this->getModelClassNameForContentType($contentType);
-        $hasContentTypeSpecificModel = $modelClassName !== WebResource::class;
 
-        if (!$hasContentTypeSpecificModel && !$this->allowUnknownResourceTypes) {
+        $isAllowedContentType = in_array($contentType->getTypeSubtypeString(), $this->allowedContentTypes);
+
+        if (!$isAllowedContentType && !$this->allowUnknownResourceTypes) {
             throw new InvalidContentTypeException($contentType, $response, $request);
         }
 

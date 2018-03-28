@@ -412,6 +412,29 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
                 'expectedResourceClassName' => WebPage::class,
                 'expectedResourceContent' => '<!doctype><html>',
             ],
+            'non-modelled content type; allow unknown resource types=true' => [
+                'allowedContentTypes' => [
+                    'text/css',
+                ],
+                'allowUnknownResourceTypes' => true,
+                'httpFixtures' => [
+                    new Response(200, ['Content-Type' => 'text/css'], 'body { color: #ff0000 }'),
+                ],
+                'expectedResourceClassName' => WebResource::class,
+                'expectedResourceContent' => 'body { color: #ff0000 }',
+            ],
+            'non-modelled content type; allow unknown resource types=false' => [
+                'allowedContentTypes' => [
+                    'text/css',
+                ],
+                'allowUnknownResourceTypes' => false,
+                'httpFixtures' => [
+                    new Response(200, ['Content-Type' => 'text/css']),
+                    new Response(200, ['Content-Type' => 'text/css'], 'body { color: #ff0000 }'),
+                ],
+                'expectedResourceClassName' => WebResource::class,
+                'expectedResourceContent' => 'body { color: #ff0000 }',
+            ],
         ];
     }
 }
