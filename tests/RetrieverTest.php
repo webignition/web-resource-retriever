@@ -3,13 +3,15 @@
 namespace webignition\Tests\WebResource;
 
 use GuzzleHttp\Client as HttpClient;
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use webignition\InternetMediaType\Parser\ParseException as InternetMediaTypeParseException;
 use webignition\WebResource\Exception\InvalidContentTypeException;
-use webignition\WebResource\Exception\Exception as WebResourceException;
+use webignition\WebResource\Exception\HttpException;
+use webignition\WebResource\Exception\TransportException;
 use webignition\WebResource\JsonDocument;
 use webignition\WebResource\Retriever;
 use webignition\WebResource\WebPage\WebPage;
@@ -25,7 +27,7 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider throwsWebResourceExceptionDataProvider
+     * @dataProvider throwsHttpExceptionDataProvider
      *
      * @param array $allowedContentTypes
      * @param bool $allowUnknownResourceTypes
@@ -35,8 +37,9 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
      *
      * @throws InternetMediaTypeParseException
      * @throws InvalidContentTypeExceptionInterface
+     * @throws TransportException
      */
-    public function testThrowsWebResourceException(
+    public function testThrowsHttpException(
         array $allowedContentTypes,
         $allowUnknownResourceTypes,
         array $httpFixtures,
@@ -54,8 +57,8 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
 
         try {
             $retriever->retrieve($request);
-            $this->fail(WebResourceException::class . ' not thrown');
-        } catch (RetrieverExceptionInterface $webResourceException) {
+            $this->fail(HttpException::class . ' not thrown');
+        } catch (HttpException $webResourceException) {
             $this->assertEquals($expectedExceptionMessage, $webResourceException->getMessage());
             $this->assertEquals($expectedExceptionCode, $webResourceException->getCode());
         }
@@ -66,7 +69,7 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
     /**
      * @return array
      */
-    public function throwsWebResourceExceptionDataProvider()
+    public function throwsHttpExceptionDataProvider()
     {
         return [
             'http 404' => [
@@ -114,6 +117,118 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
                 ],
                 'expectedExceptionMessage' => 'Moved Permanently',
                 'expectedExceptionCode' => 301,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider throwsCurlTransportExceptionDataProvider
+     *
+     * @param array $httpFixtures
+     * @param string $expectedExceptionMessage
+     * @param int $expectedExceptionCurlCode
+     *
+     * @throws InternetMediaTypeParseException
+     * @throws InvalidContentTypeExceptionInterface
+     * @throws RetrieverExceptionInterface
+     */
+    public function testThrowsCurlTransportException(
+        array $httpFixtures,
+        $expectedExceptionMessage,
+        $expectedExceptionCurlCode
+    ) {
+        $mockHandler = new MockHandler($httpFixtures);
+        $httpClient = new HttpClient([
+            'handler' => HandlerStack::create($mockHandler),
+        ]);
+
+        $request = new Request('GET', 'http://example.com');
+
+        $retriever = new Retriever($httpClient);
+
+        try {
+            $retriever->retrieve($request);
+            $this->fail(TransportException::class . ' not thrown');
+        } catch (TransportException $transportException) {
+            $this->assertTrue($transportException->isCurlException());
+            $this->assertEquals($expectedExceptionMessage, $transportException->getMessage());
+            $this->assertEquals($expectedExceptionCurlCode, $transportException->getTransportErrorCode());
+        }
+
+        $this->assertEquals(0, $mockHandler->count());
+    }
+
+    /**
+     * @return array
+     */
+    public function throwsCurlTransportExceptionDataProvider()
+    {
+        $operationTimedOutConnectException =  new ConnectException(
+            'cURL error 28: operation timed out',
+            new Request('GET', 'http://example.com/')
+        );
+
+        return [
+            'operation timed out' => [
+                'httpFixtures' => [
+                    $operationTimedOutConnectException,
+                ],
+                'expectedExceptionMessage' => 'operation timed out',
+                'expectedExceptionCurlCode' => 28,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider throwsConnectTransportExceptionDataProvider
+     *
+     * @param array $httpFixtures
+     * @param string $expectedExceptionMessage
+     *
+     * @throws InternetMediaTypeParseException
+     * @throws InvalidContentTypeExceptionInterface
+     * @throws RetrieverExceptionInterface
+     */
+    public function testThrowsConnectTransportException(
+        array $httpFixtures,
+        $expectedExceptionMessage
+    ) {
+        $mockHandler = new MockHandler($httpFixtures);
+        $httpClient = new HttpClient([
+            'handler' => HandlerStack::create($mockHandler),
+        ]);
+
+        $request = new Request('GET', 'http://example.com');
+
+        $retriever = new Retriever($httpClient);
+
+        try {
+            $retriever->retrieve($request);
+            $this->fail(TransportException::class . ' not thrown');
+        } catch (TransportException $transportException) {
+            $this->assertFalse($transportException->isCurlException());
+            $this->assertEquals($expectedExceptionMessage, $transportException->getMessage());
+        }
+
+        $this->assertEquals(0, $mockHandler->count());
+    }
+
+    /**
+     * @return array
+     */
+    public function throwsConnectTransportExceptionDataProvider()
+    {
+        $connectException =  new ConnectException(
+            'foo',
+            new Request('GET', 'http://example.com/')
+        );
+
+        return [
+            'operation timed out' => [
+                'httpFixtures' => [
+                    $connectException,
+                ],
+                'expectedExceptionMessage' => 'foo',
             ],
         ];
     }
