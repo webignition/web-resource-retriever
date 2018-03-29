@@ -15,6 +15,7 @@ use webignition\WebResource\Exception\HttpException;
 use webignition\WebResource\Exception\InvalidContentTypeException;
 use webignition\WebResource\Exception\TransportException;
 use webignition\WebResource\WebPage\WebPage;
+use webignition\WebResourceInterfaces\InvalidContentTypeExceptionInterface;
 use webignition\WebResourceInterfaces\RetrieverInterface;
 use webignition\WebResourceInterfaces\WebResourceInterface;
 
@@ -95,7 +96,7 @@ class Retriever implements RetrieverInterface
      *
      * @throws HttpException
      * @throws InternetMediaTypeParseException
-     * @throws InvalidContentTypeException
+     * @throws InvalidContentTypeExceptionInterface
      * @throws TransportException
      */
     public function retrieve(RequestInterface $request)
@@ -134,7 +135,7 @@ class Retriever implements RetrieverInterface
      * @return string
      *
      * @throws InternetMediaTypeParseException
-     * @throws InvalidContentTypeException
+     * @throws InvalidContentTypeExceptionInterface
      */
     private function getModelClassNameFromContentTypeWithContentTypeVerification(
         RequestInterface $request,
@@ -175,7 +176,7 @@ class Retriever implements RetrieverInterface
      *
      * @return bool
      *
-     * @throws InvalidContentTypeException
+     * @throws InvalidContentTypeExceptionInterface
      * @throws InternetMediaTypeParseException
      */
     private function preVerifyContentType(RequestInterface $request)
