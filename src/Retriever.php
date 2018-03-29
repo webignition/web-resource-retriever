@@ -12,7 +12,7 @@ use webignition\InternetMediaType\Parser\ParseException as InternetMediaTypePars
 use webignition\InternetMediaType\Parser\Parser as InternetMediaTypeParser;
 use webignition\InternetMediaTypeInterface\InternetMediaTypeInterface;
 use webignition\WebResource\Exception\HttpException;
-use webignition\WebResource\Exception\InvalidContentTypeException;
+use webignition\WebResource\Exception\InvalidResponseContentTypeException;
 use webignition\WebResource\Exception\TransportException;
 use webignition\WebResource\WebPage\WebPage;
 use webignition\WebResourceInterfaces\RetrieverInterface;
@@ -95,8 +95,8 @@ class Retriever implements RetrieverInterface
      *
      * @throws HttpException
      * @throws InternetMediaTypeParseException
-     * @throws InvalidContentTypeException
      * @throws TransportException
+     * @throws InvalidResponseContentTypeException
      */
     public function retrieve(RequestInterface $request)
     {
@@ -134,7 +134,7 @@ class Retriever implements RetrieverInterface
      * @return string
      *
      * @throws InternetMediaTypeParseException
-     * @throws InvalidContentTypeException
+     * @throws InvalidResponseContentTypeException
      */
     private function getModelClassNameFromContentTypeWithContentTypeVerification(
         RequestInterface $request,
@@ -146,7 +146,7 @@ class Retriever implements RetrieverInterface
         $isAllowedContentType = in_array($contentType->getTypeSubtypeString(), $this->allowedContentTypes);
 
         if (!$isAllowedContentType && !$this->allowUnknownResourceTypes) {
-            throw new InvalidContentTypeException($contentType, $response, $request);
+            throw new InvalidResponseContentTypeException($contentType, $request, $response);
         }
 
         return $modelClassName;
@@ -175,8 +175,8 @@ class Retriever implements RetrieverInterface
      *
      * @return bool
      *
-     * @throws InvalidContentTypeException
      * @throws InternetMediaTypeParseException
+     * @throws InvalidResponseContentTypeException
      */
     private function preVerifyContentType(RequestInterface $request)
     {

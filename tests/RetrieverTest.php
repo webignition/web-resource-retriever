@@ -9,8 +9,8 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use webignition\InternetMediaType\Parser\ParseException as InternetMediaTypeParseException;
-use webignition\WebResource\Exception\InvalidContentTypeException;
 use webignition\WebResource\Exception\HttpException;
+use webignition\WebResource\Exception\InvalidResponseContentTypeException;
 use webignition\WebResource\Exception\TransportException;
 use webignition\WebResource\JsonDocument;
 use webignition\WebResource\Retriever;
@@ -131,7 +131,7 @@ class RetrieverTest extends \PHPUnit_Framework_TestCase
      *
      * @throws HttpException
      * @throws InternetMediaTypeParseException
-     * @throws InvalidContentTypeException
+     * @throws InvalidResponseContentTypeException
      */
     public function testThrowsCurlTransportException(
         $allowUnknownResourceTypes,
@@ -276,10 +276,10 @@ class RetrieverTest extends \PHPUnit_Framework_TestCase
 
         try {
             $retriever->retrieve($request);
-            $this->fail(InvalidContentTypeException::class . ' not thrown');
-        } catch (InvalidContentTypeExceptionInterface $invalidContentTypeException) {
+            $this->fail(InvalidResponseContentTypeException::class . ' not thrown');
+        } catch (InvalidResponseContentTypeException $invalidContentTypeException) {
             $this->assertEquals($expectedExceptionMessage, $invalidContentTypeException->getMessage());
-            $this->assertEquals(InvalidContentTypeException::CODE, $invalidContentTypeException->getCode());
+            $this->assertEquals(InvalidResponseContentTypeException::CODE, $invalidContentTypeException->getCode());
 
             $this->assertEquals(
                 $expectedExceptionResponseContentType,
