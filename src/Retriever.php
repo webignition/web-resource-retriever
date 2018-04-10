@@ -101,8 +101,7 @@ class Retriever implements RetrieverInterface
     public function retrieve(RequestInterface $request)
     {
         if (!$this->allowUnknownResourceTypes) {
-            $headRequest = clone $request;
-            $headRequest->withMethod('HEAD');
+            $headRequest = $request->withMethod('HEAD');
 
             $this->preVerifyContentType($headRequest);
         }
