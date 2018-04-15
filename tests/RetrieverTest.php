@@ -22,11 +22,6 @@ use webignition\WebResourceInterfaces\RetrieverExceptionInterface;
 
 class RetrieverTest extends \PHPUnit_Framework_TestCase
 {
-    public function testCreate()
-    {
-        new Retriever();
-    }
-
     /**
      * @dataProvider throwsHttpExceptionDataProvider
      *
