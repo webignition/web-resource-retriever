@@ -4,7 +4,9 @@ namespace webignition\WebResource;
 
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\BadResponseException;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\TransferStats;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use webignition\InternetMediaType\InternetMediaType;
@@ -97,6 +99,7 @@ class Retriever implements RetrieverInterface
      * @throws InternetMediaTypeParseException
      * @throws TransportException
      * @throws InvalidResponseContentTypeException
+     * @throws GuzzleException
      */
     public function retrieve(RequestInterface $request)
     {
@@ -106,8 +109,16 @@ class Retriever implements RetrieverInterface
             $this->preVerifyContentType($headRequest);
         }
 
+        $requestUri = $request->getUri();
+
         try {
-            $response = $this->httpClient->send($request);
+            $response = $this->httpClient->send($request, [
+                'on_stats' => function (TransferStats $stats) use (&$requestUri) {
+                    if ($stats->hasResponse()) {
+                        $requestUri = $stats->getEffectiveUri();
+                    }
+                },
+            ]);
         } catch (BadResponseException $badResponseException) {
             $response = $badResponseException->getResponse();
         } catch (RequestException $requestException) {
@@ -123,7 +134,7 @@ class Retriever implements RetrieverInterface
 
         $modelClassName = $this->getModelClassNameFromContentTypeWithContentTypeVerification($request, $response);
 
-        return new $modelClassName($response, $request->getUri());
+        return new $modelClassName($response, $requestUri);
     }
 
     /**

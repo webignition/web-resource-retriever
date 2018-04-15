@@ -4,6 +4,7 @@ namespace webignition\Tests\WebResource;
 
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Request;
@@ -38,6 +39,7 @@ class RetrieverTest extends \PHPUnit_Framework_TestCase
      * @throws InternetMediaTypeParseException
      * @throws InvalidContentTypeExceptionInterface
      * @throws TransportException
+     * @throws GuzzleException
      */
     public function testThrowsHttpException(
         array $allowedContentTypes,
@@ -132,6 +134,7 @@ class RetrieverTest extends \PHPUnit_Framework_TestCase
      * @throws HttpException
      * @throws InternetMediaTypeParseException
      * @throws InvalidResponseContentTypeException
+     * @throws GuzzleException
      */
     public function testThrowsCurlTransportException(
         $allowUnknownResourceTypes,
@@ -200,6 +203,7 @@ class RetrieverTest extends \PHPUnit_Framework_TestCase
      * @throws InternetMediaTypeParseException
      * @throws InvalidContentTypeExceptionInterface
      * @throws RetrieverExceptionInterface
+     * @throws GuzzleException
      */
     public function testThrowsConnectTransportException(
         array $httpFixtures,
@@ -257,6 +261,7 @@ class RetrieverTest extends \PHPUnit_Framework_TestCase
      * @throws InternetMediaTypeParseException
      * @throws InvalidContentTypeExceptionInterface
      * @throws RetrieverExceptionInterface
+     * @throws GuzzleException
      */
     public function testGetInvalidContentType(
         array $allowedContentTypes,
@@ -350,17 +355,21 @@ class RetrieverTest extends \PHPUnit_Framework_TestCase
      * @param bool $allowUnknownResourceTypes
      * @param array $httpFixtures
      * @param string $expectedResourceClassName
+     * @param string $expectedResourceUrl
      * @param string $expectedResourceContent
      *
+     * @throws GuzzleException
+     * @throws HttpException
      * @throws InternetMediaTypeParseException
-     * @throws InvalidContentTypeExceptionInterface
-     * @throws RetrieverExceptionInterface
+     * @throws InvalidResponseContentTypeException
+     * @throws TransportException
      */
     public function testGetSuccess(
         array $allowedContentTypes,
         $allowUnknownResourceTypes,
         array $httpFixtures,
         $expectedResourceClassName,
+        $expectedResourceUrl,
         $expectedResourceContent
     ) {
         $mockHandler = new MockHandler($httpFixtures);
@@ -374,6 +383,8 @@ class RetrieverTest extends \PHPUnit_Framework_TestCase
         $resource = $retriever->retrieve($request);
 
         $this->assertInstanceOf($expectedResourceClassName, $resource);
+
+        $this->assertEquals($expectedResourceUrl, (string)$resource->getUri());
         $this->assertEquals($expectedResourceContent, $resource->getContent());
 
         $this->assertEquals(0, $mockHandler->count());
@@ -392,6 +403,7 @@ class RetrieverTest extends \PHPUnit_Framework_TestCase
                     new Response(200, ['Content-Type' => 'text/plain'], 'Foo'),
                 ],
                 'expectedResourceClassName' => WebResource::class,
+                'expectedResourceUrl' => 'http://example.com',
                 'expectedResourceContent' => 'Foo',
             ],
             'text/html' => [
@@ -401,6 +413,7 @@ class RetrieverTest extends \PHPUnit_Framework_TestCase
                     new Response(200, ['Content-Type' => 'text/html'], '<!doctype><html>'),
                 ],
                 'expectedResourceClassName' => WebPage::class,
+                'expectedResourceUrl' => 'http://example.com',
                 'expectedResourceContent' => '<!doctype><html>',
             ],
             'application/json' => [
@@ -410,6 +423,7 @@ class RetrieverTest extends \PHPUnit_Framework_TestCase
                     new Response(200, ['Content-Type' => 'application/json'], '[]'),
                 ],
                 'expectedResourceClassName' => JsonDocument::class,
+                'expectedResourceUrl' => 'http://example.com',
                 'expectedResourceContent' => '[]',
             ],
             'text/html with content-type pre-verification' => [
@@ -422,6 +436,7 @@ class RetrieverTest extends \PHPUnit_Framework_TestCase
                     new Response(200, ['Content-Type' => 'text/html'], '<!doctype><html>'),
                 ],
                 'expectedResourceClassName' => WebPage::class,
+                'expectedResourceUrl' => 'http://example.com',
                 'expectedResourceContent' => '<!doctype><html>',
             ],
             'non-modelled content type; allow unknown resource types=true' => [
@@ -433,6 +448,7 @@ class RetrieverTest extends \PHPUnit_Framework_TestCase
                     new Response(200, ['Content-Type' => 'text/css'], 'body { color: #ff0000 }'),
                 ],
                 'expectedResourceClassName' => WebResource::class,
+                'expectedResourceUrl' => 'http://example.com',
                 'expectedResourceContent' => 'body { color: #ff0000 }',
             ],
             'non-modelled content type; allow unknown resource types=false' => [
@@ -445,7 +461,19 @@ class RetrieverTest extends \PHPUnit_Framework_TestCase
                     new Response(200, ['Content-Type' => 'text/css'], 'body { color: #ff0000 }'),
                 ],
                 'expectedResourceClassName' => WebResource::class,
+                'expectedResourceUrl' => 'http://example.com',
                 'expectedResourceContent' => 'body { color: #ff0000 }',
+            ],
+            'redirect impacts resource url' => [
+                'allowedContentTypes' => [],
+                'allowUnknownResourceTypes' => true,
+                'httpFixtures' => [
+                    new Response(301, ['Location' => 'http://sub.example.com']),
+                    new Response(200, ['Content-Type' => 'text/html'], '<!doctype><html>'),
+                ],
+                'expectedResourceClassName' => WebPage::class,
+                'expectedResourceUrl' => 'http://sub.example.com',
+                'expectedResourceContent' => '<!doctype><html>',
             ],
         ];
     }
