@@ -15,6 +15,7 @@ use webignition\InternetMediaTypeInterface\InternetMediaTypeInterface;
 use webignition\WebResource\Exception\HttpException;
 use webignition\WebResource\Exception\InvalidResponseContentTypeException;
 use webignition\WebResource\Exception\TransportException;
+use webignition\WebResource\JsonDocument\JsonDocument;
 use webignition\WebResource\WebPage\WebPage;
 use webignition\WebResourceInterfaces\RetrieverInterface;
 use webignition\WebResourceInterfaces\WebResourceInterface;
@@ -125,7 +126,10 @@ class Retriever implements RetrieverInterface
 
         $modelClassName = $this->getModelClassNameFromContentTypeWithContentTypeVerification($request, $response);
 
-        return new $modelClassName($response, $requestUri);
+        return new $modelClassName(WebResourceProperties::create([
+            WebResourceProperties::ARG_URI => $requestUri,
+            WebResourceProperties::ARG_RESPONSE => $response,
+        ]));
     }
 
     /**

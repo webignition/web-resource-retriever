@@ -31,12 +31,12 @@
     },
     "require": {
         "php": ">=7.2.0",
-        "webignition/web-resource-interfaces":">=0.11,<1",
-        "webignition/internet-media-type-interface":"^0.1",
-        "webignition/web-resource-model": ">=3.3,<4",
-        "webignition/web-page-model": ">=3.1.1,<4",
-        "webignition/web-json-model": ">=3.1.1,<4",
-        "webignition/internet-media-type":"^1.2",
+        "webignition/web-resource-interfaces":">=3.3,<4",
+        "webignition/internet-media-type-interface":"^0.4",
+        "webignition/web-resource-model": ">=5.2,<6",
+        "webignition/web-page-model": ">=5,<6",
+        "webignition/web-json-model": ">=5,<6",
+        "webignition/internet-media-type":">=2,<3",
         "guzzlehttp/guzzle":"^6",
         "webignition/guzzle-curl-exception":"^1"
     },

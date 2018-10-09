@@ -13,7 +13,7 @@ use webignition\InternetMediaType\Parser\ParseException as InternetMediaTypePars
 use webignition\WebResource\Exception\HttpException;
 use webignition\WebResource\Exception\InvalidResponseContentTypeException;
 use webignition\WebResource\Exception\TransportException;
-use webignition\WebResource\JsonDocument;
+use webignition\WebResource\JsonDocument\JsonDocument;
 use webignition\WebResource\Retriever;
 use webignition\WebResource\WebPage\WebPage;
 use webignition\WebResource\WebResource;
