@@ -11,10 +11,7 @@ class InvalidResponseContentTypeExceptionTest extends \PHPUnit\Framework\TestCas
 {
     public function testCreate()
     {
-        $contentType = new InternetMediaType();
-        $contentType->setType('application');
-        $contentType->setSubtype('pdf');
-
+        $contentType = new InternetMediaType('application', 'pdf');
         $request = new Request('GET', 'http://example.com/');
         $response = new Response();
 
