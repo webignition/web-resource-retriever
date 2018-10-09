@@ -38,10 +38,10 @@ class RetrieverTest extends \PHPUnit\Framework\TestCase
      */
     public function testThrowsHttpException(
         array $allowedContentTypes,
-        $allowUnknownResourceTypes,
+        bool $allowUnknownResourceTypes,
         array $httpFixtures,
-        $expectedExceptionMessage,
-        $expectedExceptionCode
+        string $expectedExceptionMessage,
+        int $expectedExceptionCode
     ) {
         $mockHandler = new MockHandler($httpFixtures);
         $httpClient = new HttpClient([
@@ -63,10 +63,7 @@ class RetrieverTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0, $mockHandler->count());
     }
 
-    /**
-     * @return array
-     */
-    public function throwsHttpExceptionDataProvider()
+    public function throwsHttpExceptionDataProvider(): array
     {
         return [
             'http 404' => [
@@ -132,10 +129,10 @@ class RetrieverTest extends \PHPUnit\Framework\TestCase
      * @throws GuzzleException
      */
     public function testThrowsCurlTransportException(
-        $allowUnknownResourceTypes,
+        bool $allowUnknownResourceTypes,
         array $httpFixtures,
-        $expectedExceptionMessage,
-        $expectedExceptionCurlCode
+        string $expectedExceptionMessage,
+        int $expectedExceptionCurlCode
     ) {
         $mockHandler = new MockHandler($httpFixtures);
         $httpClient = new HttpClient([
@@ -158,10 +155,7 @@ class RetrieverTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0, $mockHandler->count());
     }
 
-    /**
-     * @return array
-     */
-    public function throwsCurlTransportExceptionDataProvider()
+    public function throwsCurlTransportExceptionDataProvider(): array
     {
         $operationTimedOutConnectException =  new ConnectException(
             'cURL error 28: operation timed out',
@@ -200,10 +194,8 @@ class RetrieverTest extends \PHPUnit\Framework\TestCase
      * @throws RetrieverExceptionInterface
      * @throws GuzzleException
      */
-    public function testThrowsConnectTransportException(
-        array $httpFixtures,
-        $expectedExceptionMessage
-    ) {
+    public function testThrowsConnectTransportException(array $httpFixtures, string $expectedExceptionMessage)
+    {
         $mockHandler = new MockHandler($httpFixtures);
         $httpClient = new HttpClient([
             'handler' => HandlerStack::create($mockHandler),
@@ -224,10 +216,7 @@ class RetrieverTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0, $mockHandler->count());
     }
 
-    /**
-     * @return array
-     */
-    public function throwsConnectTransportExceptionDataProvider()
+    public function throwsConnectTransportExceptionDataProvider(): array
     {
         $connectException =  new ConnectException(
             'foo',
@@ -260,10 +249,10 @@ class RetrieverTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetInvalidContentType(
         array $allowedContentTypes,
-        $allowUnknownResourceTypes,
+        bool $allowUnknownResourceTypes,
         array $httpFixtures,
-        $expectedExceptionMessage,
-        $expectedExceptionResponseContentType
+        string $expectedExceptionMessage,
+        string $expectedExceptionResponseContentType
     ) {
         $mockHandler = new MockHandler($httpFixtures);
         $httpClient = new HttpClient([
@@ -290,10 +279,7 @@ class RetrieverTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0, $mockHandler->count());
     }
 
-    /**
-     * @return array
-     */
-    public function getInvalidContentTypeDataProvider()
+    public function getInvalidContentTypeDataProvider(): array
     {
         return [
             'no allowed content types; fails pre-verification' => [
@@ -361,11 +347,11 @@ class RetrieverTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetSuccess(
         array $allowedContentTypes,
-        $allowUnknownResourceTypes,
+        bool $allowUnknownResourceTypes,
         array $httpFixtures,
-        $expectedResourceClassName,
-        $expectedResourceUrl,
-        $expectedResourceContent
+        string $expectedResourceClassName,
+        string $expectedResourceUrl,
+        string $expectedResourceContent
     ) {
         $mockHandler = new MockHandler($httpFixtures);
         $httpClient = new HttpClient([
@@ -385,10 +371,7 @@ class RetrieverTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0, $mockHandler->count());
     }
 
-    /**
-     * @return array
-     */
-    public function getSuccessDataProvider()
+    public function getSuccessDataProvider(): array
     {
         return [
             'text/plain no mapped resource type' => [

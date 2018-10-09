@@ -13,10 +13,6 @@ class HttpException extends AbstractException implements RetrieverHttpExceptionI
      */
     private $response;
 
-    /**
-     * @param ResponseInterface $response
-     * @param RequestInterface|null $request
-     */
     public function __construct(RequestInterface $request, ResponseInterface $response)
     {
         $this->response = $response;
@@ -27,10 +23,7 @@ class HttpException extends AbstractException implements RetrieverHttpExceptionI
         parent::__construct($request, $reasonPhrase, $statusCode);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getResponse()
+    public function getResponse(): ResponseInterface
     {
         return $this->response;
     }

@@ -9,7 +9,6 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\TransferStats;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use webignition\InternetMediaType\InternetMediaType;
 use webignition\InternetMediaType\Parser\ParseException as InternetMediaTypeParseException;
 use webignition\InternetMediaType\Parser\Parser as InternetMediaTypeParser;
 use webignition\InternetMediaTypeInterface\InternetMediaTypeInterface;
@@ -41,15 +40,10 @@ class Retriever implements RetrieverInterface
      */
     private $allowUnknownResourceTypes = self::DEFAULT_ALLOW_UNKNOWN_RESOURCE_TYPES;
 
-    /**
-     * @param HttpClient|null $httpClient
-     * @param array $allowedContentTypes
-     * @param bool $allowUnknownResourceTypes
-     */
     public function __construct(
         HttpClient $httpClient = null,
-        $allowedContentTypes = self::DEFAULT_ALLOWED_CONTENT_TYPES,
-        $allowUnknownResourceTypes = self::DEFAULT_ALLOW_UNKNOWN_RESOURCE_TYPES
+        array $allowedContentTypes = self::DEFAULT_ALLOWED_CONTENT_TYPES,
+        bool $allowUnknownResourceTypes = self::DEFAULT_ALLOW_UNKNOWN_RESOURCE_TYPES
     ) {
         if (empty($httpClient)) {
             $httpClient = new HttpClient();
@@ -60,9 +54,6 @@ class Retriever implements RetrieverInterface
         $this->setAllowUnknownResourceTypes($allowUnknownResourceTypes);
     }
 
-    /**
-     * @param HttpClient $httpClient
-     */
     public function setHttpClient(HttpClient $httpClient)
     {
         $this->httpClient = $httpClient;
@@ -101,7 +92,7 @@ class Retriever implements RetrieverInterface
      * @throws InvalidResponseContentTypeException
      * @throws GuzzleException
      */
-    public function retrieve(RequestInterface $request)
+    public function retrieve(RequestInterface $request): WebResourceInterface
     {
         if (!$this->allowUnknownResourceTypes) {
             $headRequest = $request->withMethod('HEAD');
@@ -149,7 +140,7 @@ class Retriever implements RetrieverInterface
     private function getModelClassNameFromContentTypeWithContentTypeVerification(
         RequestInterface $request,
         ResponseInterface $response
-    ) {
+    ): string {
         $contentType = $this->getContentTypeFromResponse($response);
         $modelClassName = $this->getModelClassNameForContentType($contentType);
 
@@ -162,12 +153,7 @@ class Retriever implements RetrieverInterface
         return $modelClassName;
     }
 
-    /**
-     * @param InternetMediaTypeInterface $contentType
-     *
-     * @return string
-     */
-    private function getModelClassNameForContentType(InternetMediaTypeInterface $contentType)
+    private function getModelClassNameForContentType(InternetMediaTypeInterface $contentType): string
     {
         if (WebPage::models($contentType)) {
             return WebPage::class;
@@ -183,12 +169,12 @@ class Retriever implements RetrieverInterface
     /**
      * @param RequestInterface $request
      *
-     * @return bool
+     * @return bool|null
      *
      * @throws InternetMediaTypeParseException
      * @throws InvalidResponseContentTypeException
      */
-    private function preVerifyContentType(RequestInterface $request)
+    private function preVerifyContentType(RequestInterface $request): ?bool
     {
         try {
             $response = $this->httpClient->send($request);
@@ -204,11 +190,11 @@ class Retriever implements RetrieverInterface
     /**
      * @param ResponseInterface $response
      *
-     * @return InternetMediaType
+     * @return InternetMediaTypeInterface
      *
      * @throws InternetMediaTypeParseException
      */
-    private function getContentTypeFromResponse(ResponseInterface $response)
+    private function getContentTypeFromResponse(ResponseInterface $response): InternetMediaTypeInterface
     {
         $mediaTypeParser = new InternetMediaTypeParser();
         $mediaTypeParser->setAttemptToRecoverFromInvalidInternalCharacter(true);

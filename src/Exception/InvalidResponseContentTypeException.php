@@ -7,7 +7,6 @@ use Psr\Http\Message\ResponseInterface;
 use webignition\InternetMediaTypeInterface\InternetMediaTypeInterface;
 use webignition\WebResourceInterfaces\InvalidContentTypeExceptionInterface;
 use webignition\WebResourceInterfaces\RetrieverContentExceptionInterface;
-use webignition\WebResourceInterfaces\RetrieverHttpExceptionInterface;
 
 class InvalidResponseContentTypeException extends AbstractException implements
     RetrieverContentExceptionInterface,
@@ -26,11 +25,6 @@ class InvalidResponseContentTypeException extends AbstractException implements
      */
     private $response;
 
-    /**
-     * @param InternetMediaTypeInterface $contentType
-     * @param RequestInterface|null $request
-     * @param ResponseInterface $response
-     */
     public function __construct(
         InternetMediaTypeInterface $contentType,
         RequestInterface $request,
@@ -42,18 +36,12 @@ class InvalidResponseContentTypeException extends AbstractException implements
         parent::__construct($request, sprintf(self::MESSAGE, $contentType->getTypeSubtypeString()), self::CODE);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getResponse()
+    public function getResponse(): ResponseInterface
     {
         return $this->response;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getContentType()
+    public function getContentType(): InternetMediaTypeInterface
     {
         return $this->contentType;
     }

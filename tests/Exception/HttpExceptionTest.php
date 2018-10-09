@@ -19,8 +19,8 @@ class HttpExceptionTest extends \PHPUnit\Framework\TestCase
     public function testCreate(
         RequestInterface $request,
         ResponseInterface $response,
-        $expectedMessage,
-        $expectedCode
+        string $expectedMessage,
+        int $expectedCode
     ) {
         $exception = new HttpException($request, $response);
 
@@ -32,10 +32,7 @@ class HttpExceptionTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($exception->getPrevious());
     }
 
-    /**
-     * @return array
-     */
-    public function createDataProvider()
+    public function createDataProvider(): array
     {
         $request = \Mockery::mock(RequestInterface::class);
 

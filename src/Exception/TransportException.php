@@ -12,10 +12,6 @@ use webignition\WebResourceInterfaces\RetrieverTransportExceptionInterface;
 
 class TransportException extends AbstractException implements RetrieverTransportExceptionInterface
 {
-    /**
-     * @param RequestInterface|null $request
-     * @param RequestException $requestException
-     */
     public function __construct(RequestInterface $request, RequestException $requestException)
     {
         $message = $requestException->getMessage();
@@ -34,26 +30,17 @@ class TransportException extends AbstractException implements RetrieverTransport
         parent::__construct($request, $message, $code, $previous);
     }
 
-    /**
-     * @return int
-     */
-    public function getTransportErrorCode()
+    public function getTransportErrorCode(): int
     {
         return $this->getCode();
     }
 
-    /**
-     * @return bool
-     */
-    public function isCurlException()
+    public function isCurlException(): bool
     {
         return $this->getPrevious() instanceof CurlException;
     }
 
-    /**
-     * @return bool
-     */
-    public function isTooManyRedirectsException()
+    public function isTooManyRedirectsException(): bool
     {
         return $this->getPrevious() instanceof TooManyRedirectsException;
     }
