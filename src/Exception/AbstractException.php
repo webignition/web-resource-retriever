@@ -12,23 +12,18 @@ abstract class AbstractException extends \Exception implements RetrieverExceptio
      */
     private $request;
 
-    /**
-     * @param RequestInterface|null $request
-     * @param string $message
-     * @param int $code
-     * @param \Exception|null $previous
-     */
-    public function __construct(RequestInterface $request, $message = null, $code = null, $previous = null)
-    {
+    public function __construct(
+        RequestInterface $request,
+        string $message = null,
+        int $code = null,
+        \Throwable $previous = null
+    ) {
         parent::__construct($message, $code, $previous);
 
         $this->request = $request;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getRequest()
+    public function getRequest(): RequestInterface
     {
         return $this->request;
     }

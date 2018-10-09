@@ -10,7 +10,7 @@ use Psr\Http\Message\RequestInterface;
 use webignition\GuzzleHttp\Exception\CurlException\Exception as CurlException;
 use webignition\WebResource\Exception\TransportException;
 
-class TransportExceptionTest extends \PHPUnit_Framework_TestCase
+class TransportExceptionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider createDataProvider
@@ -25,10 +25,10 @@ class TransportExceptionTest extends \PHPUnit_Framework_TestCase
     public function testCreate(
         RequestInterface $request,
         RequestException $requestException,
-        $expectedMessage,
-        $expectedCode,
-        $expectedIsCurlException,
-        $expectedIsTooManyRedirectsException
+        string $expectedMessage,
+        int $expectedCode,
+        bool $expectedIsCurlException,
+        bool $expectedIsTooManyRedirectsException
     ) {
         $exception = new TransportException($request, $requestException);
 
@@ -52,10 +52,7 @@ class TransportExceptionTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function createDataProvider()
+    public function createDataProvider(): array
     {
         /* @var RequestInterface|MockInterface $request */
         $request = \Mockery::mock(RequestInterface::class);

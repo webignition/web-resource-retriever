@@ -6,7 +6,7 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use webignition\WebResource\Exception\HttpException;
 
-class HttpExceptionTest extends \PHPUnit_Framework_TestCase
+class HttpExceptionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider createDataProvider
@@ -19,8 +19,8 @@ class HttpExceptionTest extends \PHPUnit_Framework_TestCase
     public function testCreate(
         RequestInterface $request,
         ResponseInterface $response,
-        $expectedMessage,
-        $expectedCode
+        string $expectedMessage,
+        int $expectedCode
     ) {
         $exception = new HttpException($request, $response);
 
@@ -32,10 +32,7 @@ class HttpExceptionTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($exception->getPrevious());
     }
 
-    /**
-     * @return array
-     */
-    public function createDataProvider()
+    public function createDataProvider(): array
     {
         $request = \Mockery::mock(RequestInterface::class);
 
