@@ -6,7 +6,7 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use webignition\WebResource\Exception\HttpException;
 
-class HttpExceptionTest extends \PHPUnit_Framework_TestCase
+class HttpExceptionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider createDataProvider

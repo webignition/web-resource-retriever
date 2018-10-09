@@ -10,7 +10,7 @@ use Psr\Http\Message\RequestInterface;
 use webignition\GuzzleHttp\Exception\CurlException\Exception as CurlException;
 use webignition\WebResource\Exception\TransportException;
 
-class TransportExceptionTest extends \PHPUnit_Framework_TestCase
+class TransportExceptionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider createDataProvider

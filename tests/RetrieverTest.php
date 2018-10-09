@@ -20,7 +20,7 @@ use webignition\WebResource\WebResource;
 use webignition\WebResourceInterfaces\InvalidContentTypeExceptionInterface;
 use webignition\WebResourceInterfaces\RetrieverExceptionInterface;
 
-class RetrieverTest extends \PHPUnit_Framework_TestCase
+class RetrieverTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider throwsHttpExceptionDataProvider
