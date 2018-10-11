@@ -484,4 +484,9 @@ class RetrieverTest extends \PHPUnit\Framework\TestCase
         $retriever = new Retriever($httpClient);
         $retriever->retrieve($request);
     }
+
+    public function testCreateWithoutHttpClient()
+    {
+        $this->assertInstanceOf(Retriever::class, new Retriever());
+    }
 }
