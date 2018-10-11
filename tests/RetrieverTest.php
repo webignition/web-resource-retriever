@@ -4,7 +4,6 @@ namespace webignition\Tests\WebResource;
 
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\ConnectException;
-use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Request;
@@ -34,7 +33,6 @@ class RetrieverTest extends \PHPUnit\Framework\TestCase
      * @throws InternetMediaTypeParseException
      * @throws InvalidContentTypeExceptionInterface
      * @throws TransportException
-     * @throws GuzzleException
      */
     public function testThrowsHttpException(
         array $allowedContentTypes,
@@ -126,7 +124,6 @@ class RetrieverTest extends \PHPUnit\Framework\TestCase
      * @throws HttpException
      * @throws InternetMediaTypeParseException
      * @throws InvalidResponseContentTypeException
-     * @throws GuzzleException
      */
     public function testThrowsCurlTransportException(
         bool $allowUnknownResourceTypes,
@@ -192,7 +189,6 @@ class RetrieverTest extends \PHPUnit\Framework\TestCase
      * @throws InternetMediaTypeParseException
      * @throws InvalidContentTypeExceptionInterface
      * @throws RetrieverExceptionInterface
-     * @throws GuzzleException
      */
     public function testThrowsConnectTransportException(array $httpFixtures, string $expectedExceptionMessage)
     {
@@ -245,7 +241,6 @@ class RetrieverTest extends \PHPUnit\Framework\TestCase
      * @throws InternetMediaTypeParseException
      * @throws InvalidContentTypeExceptionInterface
      * @throws RetrieverExceptionInterface
-     * @throws GuzzleException
      */
     public function testGetInvalidContentType(
         array $allowedContentTypes,
@@ -316,6 +311,18 @@ class RetrieverTest extends \PHPUnit\Framework\TestCase
                 'expectedExceptionMessage' => 'Invalid content type "text/plain"',
                 'expectedExceptionResponseContentType' => 'text/plain',
             ],
+            'disallowed content type; guzzle exception on pre-verification, fails post-verification' => [
+                'allowedContentTypes' => [
+                    'text/html',
+                ],
+                'allowUnknownResourceTypes' => false,
+                'httpFixtures' => [
+                    new UnhandledGuzzleException(),
+                    new Response(200, ['Content-Type' => 'text/plain']),
+                ],
+                'expectedExceptionMessage' => 'Invalid content type "text/plain"',
+                'expectedExceptionResponseContentType' => 'text/plain',
+            ],
             'no defined allowed content types; fails post-verification' => [
                 'allowedContentTypes' => [],
                 'allowUnknownResourceTypes' => false,
@@ -339,7 +346,6 @@ class RetrieverTest extends \PHPUnit\Framework\TestCase
      * @param string $expectedResourceUrl
      * @param string $expectedResourceContent
      *
-     * @throws GuzzleException
      * @throws HttpException
      * @throws InternetMediaTypeParseException
      * @throws InvalidResponseContentTypeException
@@ -454,5 +460,33 @@ class RetrieverTest extends \PHPUnit\Framework\TestCase
                 'expectedResourceContent' => '<!doctype><html>',
             ],
         ];
+    }
+
+    /**
+     * @throws HttpException
+     * @throws InternetMediaTypeParseException
+     * @throws InvalidResponseContentTypeException
+     * @throws TransportException
+     */
+    public function testThrowsGuzzleException()
+    {
+        $mockHandler = new MockHandler([
+            new UnhandledGuzzleException(),
+        ]);
+        $httpClient = new HttpClient([
+            'handler' => HandlerStack::create($mockHandler),
+        ]);
+
+        $request = new Request('GET', 'http://example.com');
+
+        $this->expectException(TransportException::class);
+
+        $retriever = new Retriever($httpClient);
+        $retriever->retrieve($request);
+    }
+
+    public function testCreateWithoutHttpClient()
+    {
+        $this->assertInstanceOf(Retriever::class, new Retriever());
     }
 }

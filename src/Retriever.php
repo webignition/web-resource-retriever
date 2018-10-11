@@ -91,7 +91,6 @@ class Retriever implements RetrieverInterface
      * @throws InternetMediaTypeParseException
      * @throws TransportException
      * @throws InvalidResponseContentTypeException
-     * @throws GuzzleException
      */
     public function retrieve(RequestInterface $request): WebResourceInterface
     {
@@ -102,6 +101,7 @@ class Retriever implements RetrieverInterface
         }
 
         $requestUri = $request->getUri();
+        $response = null;
 
         try {
             $response = $this->httpClient->send($request, [
@@ -115,6 +115,11 @@ class Retriever implements RetrieverInterface
             $response = $badResponseException->getResponse();
         } catch (RequestException $requestException) {
             throw new TransportException($request, $requestException);
+        } catch (GuzzleException $guzzleException) {
+            throw new TransportException(
+                $request,
+                new RequestException($guzzleException->getMessage(), $request, null, $guzzleException)
+            );
         }
 
         $responseStatusCode = $response->getStatusCode();
@@ -183,6 +188,8 @@ class Retriever implements RetrieverInterface
         try {
             $response = $this->httpClient->send($request);
         } catch (RequestException $requestException) {
+            return null;
+        } catch (GuzzleException $guzzleException) {
             return null;
         }
 
